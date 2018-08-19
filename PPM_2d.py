@@ -87,24 +87,3 @@ for c in (hull_2.simplices):															  # Set of indicies of points forming
 
 df_log = df_log.sort_index()  															  # sorting by index
 print(df_log.head(12))
-
-
-
-#for i, c in enumerate(hull_2.vertices):
-#	if i == hull_2.vertices.shape[0]:
-#		# Send current crd and next pt
-#		h2_crd = np.matrix([hull_2.vertices[i],hull_2.vertices[-i]])
-#	else:
-#		# Send current crd and first pt
-#		h2_crd = np.matrix([hull_2.vertices[i],hull_2.vertices[+1]])
-#	for j, s in enumerate(hull_1.vertices):
-#		if j == hull_1.vertices.shape[0]:
-#			# Send current pt and next pt
-#			h1_crd = np.matrix([hull_1.vertices[i],hull_1.vertices[-i]])
-#		else:
-#			# Send current pt and first pt
-#			h1_crd = np.matrix([hull_1.vertices[i],hull_1.vertices[+1]])
-#		print (h1_crd)
-#		for h1_crd_p in permutations(h1_crd,2):
-#			target_crd_set = np.vstack((h2_crd,h1_crd_p))
-#			print ('target_crd_set', target_crd_set)
