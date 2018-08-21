@@ -27,21 +27,28 @@ def find_scale (pts):
 	
 def find_rot (pts):																		  # Needs rto be updated to handle 4 input points, instead of 2. We could just calculate pts_adj to work off the standard basis as we initially planned. Also need to calculate resultant translation_offset and add it to the accumulator. 
 	global translation_offset															  # access to the translation accumulator (still need to implement calc of offset)
-	v0 = pts[0]																			  # v0 = [x,y,z] = [i<hat>, j<hat>, k<hat>]
-	v1 = pts[1]																			  # v1 = [x,y,z] = [i<hat>, j<hat>, k<hat>]
+	v0 = pts[0,1] -	pts[0,0]																		  # v0 = [x,y,z] = [i<hat>, j<hat>, k<hat>]
+	v1 = pts[1,1] - pts[1,0]
+	print('rot_v', v0, v1)																			  # v1 = [x,y,z] = [i<hat>, j<hat>, k<hat>]
 	alpha = np.arctan2(v1[1],v1[0]) - np.arctan2(v0[1],v0[0])							  # alpha angle about x-axis of standard basis (rad)
+	r = np.sqrt(pts[0,0,0]**2 + pts[0,0,1]**2)
+	rot_off = np.array([np.cos(alpha) * r , np.sin(alpha) * r])
+	print ('rot_off', rot_off)
+	print ('rot_pt_off', pts[0,0])
+	#translation_offset += (-pts[0,0] + rot_off)
+	print ('alpha r', alpha, r)
 	if (pts.shape == (2,2,3)):
 		beta = np.arctan2(v1[2], np.sqrt(np.pow(v1[0],2) + np.pow(v1[1],2))) 			  # beta angle about y-axis of standard basis (rad)
 		- np.arctan2(v0[2], np.sqrt(np.pow(v0[0],2) + np.pow(v0[1],2)))
-		#return  np.array([alpha,beta,0])												  # todo: fix the locations of these, rotation about the: {x-axis, y-axis, z-axis}
-		return np.array([0,0,np.pi/2])
-	#return np.array([alpha,0,0])
-	return np.array([0,0,np.pi/2])														  # Testing of proper roation applicatin by the TM algorithm (rad)
+		return  np.array([0,-beta,-alpha])												  # todo: fix the locations of these, rotation about the: {x-axis, y-axis, z-axis}
+		#return np.array([0,0,np.pi/2])
+	return np.array([0,0,-alpha])
+	#return np.array([0,0,np.pi/2])														  # Testing of proper roation applicatin by the TM algorithm (rad)
 
 def find_shear (pts):																	  # to do: build in shear support (warp support)
 	return np.ones(3)
 
-def find_trans (pts):																	  # todo: add in the translation_offset
+def find_trans (pts):																	  # todo: add in the translation_offset for rotation & scale
 	global translation_offset
 	if (pts.shape == (2,2,3)):
 		return -(np.append(pts[1,0] - pts[0,0],0)) + translation_offset 
