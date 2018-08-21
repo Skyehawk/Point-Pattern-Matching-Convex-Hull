@@ -15,11 +15,6 @@ def comp_matrix(scale, rotation, shear, translation):
 	Ryc, Rys = np.cos(rotation[1]), np.sin(rotation[1])		# eff: we call these variables multiple times, create standalones for efficency   if Shx else 0
 	Rzc, Rzs = (1,0) if rotation.size < 3 else (np.cos(rotation[2]), np.sin(rotation[2]))
 
-	# rotation.size  < 3:
-	#	Rzc, Rzs = 1,0 
-	#else: 
-	#	Rzc, Rzs = np.cos(rotation[2]), np.sin(rotation[2])
-
 	T_M = np.array([[1, 0, 0, Tx],
                     [0, 1, 0, Ty],
                     [0, 0, 1, Tz],
