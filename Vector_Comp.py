@@ -39,32 +39,33 @@ def find_rot (pts):
 	temp_offset = (pts[0,0] - rot_off)													  # failing due to rot_off sometimes being larger than the value of the pt it is being subtracted from
 
 	#find quadrent & apply based on that for offset
-	if rot_off[0]>0 && rot_off[1]>0:													  # q1
+	if rot_off[0]>0 and rot_off[1]>0:													  # q1
 		temp_offset *= np.array([1,-1])
-	elif rot_off[0]<0 && rot_off[1]>0:													  # q2
+	elif rot_off[0]<0 and rot_off[1]>0:													  # q2
 		temp_offset *= np.array([-1,-1])
-	elif rot_off[0]<0 && rot_off[1]<0:													  # q3
+	elif rot_off[0]<0 and rot_off[1]<0:													  # q3
 		temp_offset *= np.array([-1,1])
-	elif rot_off[0]>0 && rot_off[1]<0:													  # q4
+	elif rot_off[0]>0 and rot_off[1]<0:													  # q4
 		temp_offset *= np.array([1,1])													  # no change
-	elif rot_off[0]>0 && rot_off[1]==0:													  # x+
-		
-	elif rot_off[0]>0 && rot_off[1]==0:													  # x-
-		
-	elif rot_off[0]==0 && rot_off[1]>0:													  # y+
-		
-	elif rot_off[0]==0 && rot_off[1]<0:													  # y-
-		
-	elif rot_off[0]==0 && rot_off[1]==0:												  # orgin
-		
+	elif rot_off[0]>0 and rot_off[1]==0:													  # x+
+		temp_offset *= np.array([1,1])
+	elif rot_off[0]>0 and rot_off[1]==0:													  # x-
+		temp_offset *= np.array([1,1])
+	elif rot_off[0]==0 and rot_off[1]>0:													  # y+
+		temp_offset *= np.array([-1,-1])
+	elif rot_off[0]==0 and rot_off[1]<0:													  # y-
+		temp_offset *= np.array([-1,-1])
+	elif rot_off[0]==0 and rot_off[1]==0:												  # orgin
+		print ('WARNING: point at orgin in rotation offset, should only occur if point was at orgin initially (0,0,0) offset required')
+	translation_offset += temp_offset
 
 	if (pts.shape == (2,2,3)):
 		beta = np.arctan2(v1[2], np.sqrt(np.pow(v1[0],2) + np.pow(v1[1],2))) 			  # beta angle about y-axis of standard basis (rad)
 		- np.arctan2(v0[2], np.sqrt(np.pow(v0[0],2) + np.pow(v0[1],2)))
-		#return  np.array([0,-beta,-alpha])												  # todo: fix the locations of these, rotation about the: {x-axis, y-axis, z-axis}
-		return np.array([0,0,0])
-	#return np.array([0,0,-alpha])
-	return np.array([0,0,0])															  # Testing of proper roation applicatin by the TM algorithm (rad)
+		return  np.array([0,-beta,-alpha])												  # todo: fix the locations of these, rotation about the: {x-axis, y-axis, z-axis}
+		#return np.array([0,0,0])
+	return np.array([0,0,-alpha])
+	#return np.array([0,0,0])															  # Testing of proper roation applicatin by the TM algorithm (rad)
 
 def find_shear (pts):																	  # to do: build in shear support (warp support) for 3d cases
 	return np.ones(3)
