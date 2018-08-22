@@ -5,7 +5,7 @@ from Transformation_Matrix import comp_matrix
 
 translation_offset = np.empty((2), dtype=float)											  # Needs to be upped to 3 for 3d
 
-def find_scale (pts):
+def find_scale (pts):																	  # TODO: check for accuracy, close, but off in testing
 	global translation_offset
 	dist_0 = 0
 	dist_1 = 0
@@ -20,22 +20,22 @@ def find_scale (pts):
 		dist_1 = np.sqrt((pts[1,1,0]-pts[1,0,0])**2 + (pts[1,1,1]-pts[1,0,1])**2)		  # Length of second simplex (2d)
 		scale_factor = (dist_1/dist_0)
 		translation_offset += ((1/scale_factor)*pts[0,0]) - pts[0,0]
-		print('target_pt', pts[0,0])
-		print('scale_factor', dist_1/dist_0)
-		print('translation_offset',translation_offset)
+		#print('target_pt', pts[0,0])
+		#print('scale_factor', dist_1/dist_0)
+		#print('translation_offset',translation_offset)
 		return (dist_1/dist_0)*np.ones(2)
 	
 def find_rot (pts):
 	global translation_offset															  # access to the translation accumulator (still need to implement calc of offset)
 	v0 = pts[0,1] -	pts[0,0]															  # v0 = [x,y,z] = [i<hat>, j<hat>, k<hat>]
 	v1 = pts[1,1] - pts[1,0]															  # v1 = [x,y,z] = [i<hat>, j<hat>, k<hat>]
-	print('rot_v', v0, v1)																
+	#print('rot_v', v0, v1)																
 	alpha = np.arctan2(v1[1],v1[0]) - np.arctan2(v0[1],v0[0])							  # alpha angle about x-axis of standard basis (rad)
 	r = np.sqrt(pts[0,0,0]**2 + pts[0,0,1]**2)
 	rot_off = np.array([np.cos(alpha) * r , np.sin(alpha) * r])
-	print ('rot_off', rot_off)
-	print ('rot_pt_off', pts[0,0])
-	print ('alpha r', alpha, r)
+	#print ('rot_off', rot_off)
+	#print ('rot_pt_off', pts[0,0])
+	#print ('alpha r', alpha, r)
 	temp_offset = (pts[0,0] - rot_off)													  # failing due to rot_off sometimes being larger than the value of the pt it is being subtracted from
 
 	#find quadrent & apply based on that for offset

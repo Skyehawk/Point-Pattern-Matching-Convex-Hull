@@ -40,11 +40,15 @@ for c in (hull_2.simplices):															  # Set of indicies of points forming
 			pts_2_t = pts_2 															  # reset our points to manipulate between checks
 			raw_input("Press Enter to continue...")  # input("Press Enter to continue...")
 			pts_considered = np.array([[hull_1.points[s[0]], hull_1.points[s[1]]], [hull_2.points[p[0]], hull_2.points[p[1]]]])
-			print ('Pts_considered', pts_considered.shape)
+			print ('Pts_considered', pts_considered)
 			transf_matrix = find_transf_matrix(np.array([[hull_1.points[s[0]], hull_1.points[s[1]]], [hull_2.points[p[0]], hull_2.points[p[1]]]]))
 			pts_2_t = transf_matrix.dot(np.c_[pts_2,np.zeros(np.size(pts_2,0)),np.ones(np.size(pts_2,0))].T) #https://mail.python.org/pipermail/python-list/2013-October/657294.html  --> apply the transformation matrix
-			pts_2_t_hull = transf_matrix.dot(np.c_[pts_2[hull_2.vertices],np.zeros(np.size(pts_2,0)),np.ones(np.size(pts_2[hull_2.vertices],0))].T)
-			print('hull_2_t', pts_2_t_hull.T[:,:2])
+			#pts_2_t_hull = transf_matrix.dot(np.c_[pts_2[hull_2.vertices],np.zeros(np.size(pts_2,0)),np.ones(np.size(pts_2[hull_2.vertices],0))].T)
+			#print('hull_2_t', pts_2_t_hull.T[:,:2])
+			side_consideration = np.array([hull_2.points[p[0]], hull_2.points[p[1]]])
+			side_consideration_t = transf_matrix.dot(np.c_[side_consideration,np.zeros(np.size(side_consideration,0)),np.ones(np.size(side_consideration,0))].T)
+			print('side_consideration', side_consideration)
+			print('side_consideration_t', side_consideration_t.T[:,:2])
 			print('pts_2_t', pts_2_t.T[:,:2])
 			#print ('transf_matrix',transf_matrix)                    
 			# X log permutation combination (indicies or otherwise)
@@ -81,10 +85,10 @@ for c in (hull_2.simplices):															  # Set of indicies of points forming
 				ax.plot(pts_2[s, 0], pts_2[s, 1], "r-")
 
 			for pts_con in pts_considered:
+				print ('pts_con', pts_con)
 				ax.plot(pts_con.T[0], pts_con.T[1], "y-")								  # is the program taking in one of the toupes as the x's and one as the y's?... yup needed to transpose it...
 
-			for pts_con_T in pts_2_t:
-				ax.plot(pts_con.T[0], pts_con.T[1], "y-")
+			ax.plot(side_consideration_t[:2,:][0], side_consideration_t[:2,:][1], "k-")
 
 			ax.set_xlabel('X_1')
 			ax.set_ylabel('Y_1')
