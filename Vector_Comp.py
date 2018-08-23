@@ -10,20 +10,20 @@ def find_scale (pts):																	  # TODO: check for accuracy, close, but o
 	dist_0 = 0
 	dist_1 = 0
 	if (pts.shape == (2,2,3)):
-		dist_0 = np.sqrt((pts[0,1,0]-pts[0,0,0])**2 + (pts[0,0,1]-pts[0,1,1])**2 + (pts[0,1,2]-pts[0,0,2])**2)	# Length of first simplex (3d)
+		dist_0 = np.sqrt((pts[0,1,0]-pts[0,0,0])**2 + (pts[0,1,1]-pts[0,0,1])**2 + (pts[0,1,2]-pts[0,0,2])**2)	# Length of first simplex (3d)
 		dist_1 = np.sqrt((pts[1,1,0]-pts[1,0,0])**2 + (pts[1,1,1]-pts[1,0,1])**2 + (pts[1,1,2]-pts[1,0,2])**2)	# Length of second simplex (3d)
-		scale_factor = (dist_1/dist_0)
-		translation_offset += np.append((1/scale_factor)*pts[0,0],0)
-		return (dist_1/dist_0)*np.ones(3)
+		scale_factor = (dist_0/dist_1)
+		translation_offset += np.append((scale_factor)*pts[0,0],0)
+		return scale_factor*np.ones(3)
 	else: 
-		dist_0 = np.sqrt((pts[0,1,0]-pts[0,0,0])**2 + (pts[0,0,1]-pts[0,1,1])**2)		  # Length of first simplex (2d)
+		dist_0 = np.sqrt((pts[0,1,0]-pts[0,0,0])**2 + (pts[0,1,1]-pts[0,0,1])**2)		  # Length of first simplex (2d)	sqrt((x2-x1)**2+(y2-y1)**2)
 		dist_1 = np.sqrt((pts[1,1,0]-pts[1,0,0])**2 + (pts[1,1,1]-pts[1,0,1])**2)		  # Length of second simplex (2d)
-		scale_factor = (dist_1/dist_0)
-		translation_offset += ((1/scale_factor)*pts[0,0]) - pts[0,0]
+		scale_factor = (dist_0/dist_1)
+		translation_offset += ((scale_factor)*pts[0,0]) - pts[0,0]
 		#print('target_pt', pts[0,0])
 		#print('scale_factor', dist_1/dist_0)
 		#print('translation_offset',translation_offset)
-		return (dist_1/dist_0)*np.ones(2)
+		return scale_factor*np.ones(2)
 	
 def find_rot (pts):
 	global translation_offset															  # access to the translation accumulator (still need to implement calc of offset)
@@ -47,13 +47,13 @@ def find_rot (pts):
 		temp_offset *= np.array([-1,1])
 	elif rot_off[0]>0 and rot_off[1]<0:													  # q4
 		temp_offset *= np.array([1,1])													  # no change
-	elif rot_off[0]>0 and rot_off[1]==0:													  # x+
+	elif rot_off[0]>0 and rot_off[1]==0:												  # x+
 		temp_offset *= np.array([1,1])
-	elif rot_off[0]>0 and rot_off[1]==0:													  # x-
+	elif rot_off[0]>0 and rot_off[1]==0:												  # x-
 		temp_offset *= np.array([1,1])
-	elif rot_off[0]==0 and rot_off[1]>0:													  # y+
+	elif rot_off[0]==0 and rot_off[1]>0:												  # y+
 		temp_offset *= np.array([-1,-1])
-	elif rot_off[0]==0 and rot_off[1]<0:													  # y-
+	elif rot_off[0]==0 and rot_off[1]<0:												  # y-
 		temp_offset *= np.array([-1,-1])
 	elif rot_off[0]==0 and rot_off[1]==0:												  # orgin
 		print ('WARNING: point at orgin in rotation offset, should only occur if point was at orgin initially (0,0,0) offset required')
