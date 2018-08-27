@@ -47,8 +47,8 @@ for c in (hull_2.simplices):															  # Set of indicies of points forming
 			#print('hull_2_t', pts_2_t_hull.T[:,:2])
 			side_consideration = np.array([hull_2.points[p[0]], hull_2.points[p[1]]])
 			side_consideration_t = transf_matrix.dot(np.c_[side_consideration,np.zeros(np.size(side_consideration,0)),np.ones(np.size(side_consideration,0))].T)
-			print('side_consideration', side_consideration)
-			print('side_consideration_t', side_consideration_t.T[:,:2])
+			#print('side_consideration', side_consideration)
+			#print('side_consideration_t', side_consideration_t.T[:,:2])
 			print('pts_2_t', pts_2_t.T[:,:2])
 			#print ('transf_matrix',transf_matrix)                    
 			# X log permutation combination (indicies or otherwise)
@@ -59,15 +59,15 @@ for c in (hull_2.simplices):															  # Set of indicies of points forming
 				#find angels theta1 and theta2
 				#2dscale o = a1 & mag = (tan() - tan())
 
-			nuScale = np.array([1.5,.5,2])												  # Scale values along X, Y, & Z axes
+			nuScale = np.ones(3)														  # Scale values along X, Y, & Z axes
 			# perform non uniform scaling (uScale)
-			o = pts_1[p[0]]	         													  # Point serving as orgin for scale (point in face)
+			orgin = np.zeros(3)	         												  # Point serving as orgin for scale (point in face)
 			#q = o * (1 - nuScale) + pts_2 * nuScale 									  # nuScaled set of points
 			# calculate transformation
 			# perform transformations
 			# calculate error
 			# log error for permutation
-			df_log.loc[-1] = [np.array([pts_1[p[0]], pts_1[p[1]]]), np.array([pts_2[p[0]], pts_2[p[1]]]), 0, o, nuScale, 1]
+			df_log.loc[-1] = [np.array([pts_1[p[0]], pts_1[p[1]]]), np.array([pts_2[p[0]], pts_2[p[1]]]), transf_matrix, orgin, nuScale, 1]
 			df_log.index = df_log.index + 1
 			#print(p)
 
@@ -85,7 +85,6 @@ for c in (hull_2.simplices):															  # Set of indicies of points forming
 				ax.plot(pts_2[s, 0], pts_2[s, 1], "r-")
 
 			for pts_con in pts_considered:
-				print ('pts_con', pts_con)
 				ax.plot(pts_con.T[0], pts_con.T[1], "y-")								  # is the program taking in one of the toupes as the x's and one as the y's?... yup needed to transpose it...
 
 			ax.plot(side_consideration_t[:2,:][0], side_consideration_t[:2,:][1], "k-")

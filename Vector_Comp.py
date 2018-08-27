@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 from Transformation_Matrix import comp_matrix
 
 # find what it takes to transform v1 to v0, return composed translation matrix
@@ -24,7 +25,7 @@ def find_scale (pts):																	  # TODO: check for accuracy, close, but o
 		translation_offset += ((uniform_scale_factor)*pts[0,0]) - pts[0,0]
 		#print('target_pt', pts[0,0])
 		print('uniform_scale_factor', dist_1/dist_0)
-		print('translation_offset',translation_offset)
+		print('scale_translation_offset_contribution',translation_offset)
 		return uniform_scale_factor*np.ones(2)
 	
 def find_rot (pts):
@@ -33,12 +34,12 @@ def find_rot (pts):
 	#temp_translation_offset = np.empty((2), dtype=float)
 	v0 = pts[0,0] -	pts[0,1]															  # v0 = [x,y,z] = [i<hat>, j<hat>, k<hat>]
 	v1 = pts[1,0] - pts[1,1]															  # v1 = [x,y,z] = [i<hat>, j<hat>, k<hat>]
-	print('rot_v', v0, v1)
+	#print('rot_v', v0, v1)
 
 	dx = pts[1,0,0] - pts[0,0,0]
 	dy = pts[1,0,1] - pts[0,0,1]
 	
-	print ('dx dy', dx, dy)
+	#print ('dx dy', dx, dy)
 	#if (pts.shape == (2,2,3)):															  # get raw translation distances
 	#	temp_translation_off = -(np.append(pts[1,0] - pts[0,0],0))
 	#else:
@@ -47,15 +48,16 @@ def find_rot (pts):
 
 	alpha = np.arctan2(v1[1],v1[0]) - np.arctan2(v0[1],v0[0])							  # alpha angle about x-axis of standard basis (rad)
 	r = np.sqrt(pts[0,0,0]**2 + pts[0,0,1]**2)
-	#r = np.sqrt((pts[1,0,0] - pts[0,0,0])**2 + (pts[1,0,1] - pts[0,0,1])**2)											  # dist from orgin (center of rotation) to alignment point (rough translation will place s1 and s2 allignment points on top of eachother, so we can use s1 alignment point in situ of s2 alignment point)
-	alpha_prime = np.arctan2(v1[1],v1[0])												  # dist to alpha from x+
+	#r = np.sqrt((pts[1,0,0] - pts[0,0,0])**2 + (pts[1,0,1] - pts[0,0,1])**2)			  # dist from orgin (center of rotation) to alignment point (rough translation will place s1 and s2 allignment points on top of eachother, so we can use s1 alignment point in situ of s2 alignment point)
+	alpha_prime = np.arctan2(v1[1],v1[0])												  # angle to alpha from x+
 	s2_align_pt = np.array([((r) * np.cos(-alpha_prime)),
-	 ((r) * np.sin(-alpha_prime))])	  # pt as calculated from standard basis
-	#s2_align_pt /= uniform_scale_factor
-	print ('alignment_pt', pts[0,0])
+	 ((r) * np.sin(-alpha_prime))])														  # pt as calculated from standard basis
+	s2_align_pt *= uniform_scale_factor
+	#print ('alignment_pt', pts[0,0])
 	print ('alpha r', alpha, r)
-	print ('alpha_prime', alpha_prime)
+	#print ('alpha_prime', alpha_prime)
 	print ('s2_align_pt', s2_align_pt)
+	#print ('usf',usf)
 	#rotation_offset = s2_align_pt - pts[0,0]														  # failing due to rot_off sometimes being larger than the value of the pt it is being subtracted from
 	#print ('rotation_offset', rotation_offset)
 	#find quadrent & apply based on that for offset
@@ -86,7 +88,9 @@ def find_rot (pts):
 	#elif pts[1,0,0]==0 and pts[1,0,1]==0:												  # orgin
 	#	print ('WARNING: point at orgin in rotation offset, should only occur if point was at orgin initially (0,0,0) offset required')
 	#print ('adj_temp_offset',temp_offset)
-	#translation_offset += s2_align_pt - pts[0,0]													  # check adjustment cases & application of tha adjustment (are we going the wrong way?)
+	print ('rotation_translation_offest_contribution', pts[0,0] - s2_align_pt)
+	translation_offset += pts[0,0] - s2_align_pt 													  # check adjustment cases & application of tha adjustment (are we going the wrong way?)
+	print ('combined scale && rotation translation_offset_contribution', translation_offset)
 
 	if (pts.shape == (2,2,3)):
 		beta = np.arctan2(v1[2], np.sqrt(np.pow(v1[0],2) + np.pow(v1[1],2))) 			  # beta angle about y-axis of standard basis (rad)
@@ -105,7 +109,7 @@ def find_trans (pts):																	  # todo: add in the translation_offset fo
 		#return -(np.append(pts[1,0] - pts[0,0],0)) #+ translation_offset 
 	#return -(pts[1,0] - pts[0,0]) #+ translation_offset 
 		return - translation_offset
-	return - np.array([pts[1,0,0] - pts[0,0,0], pts[1,0,1] - pts[0,0,1]]) #- translation_offset
+	return - np.array([pts[1,0,0] - pts[0,0,0], pts[1,0,1] - pts[0,0,1]])# + translation_offset
 	
 def find_transf_matrix (pts):															  # Do a check that we are getting 2 or 3 dimentional crds
 	print('pts', pts)
