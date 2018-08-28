@@ -51,7 +51,7 @@ def find_rot (pts):
 	#r = np.sqrt((pts[1,0,0] - pts[0,0,0])**2 + (pts[1,0,1] - pts[0,0,1])**2)			  # dist from orgin (center of rotation) to alignment point (rough translation will place s1 and s2 allignment points on top of eachother, so we can use s1 alignment point in situ of s2 alignment point)
 	alpha_prime = np.arctan2(v1[1],v1[0])												  # angle to alpha from x+
 	s2_align_pt = np.array([((r) * np.cos(-alpha_prime)),
-	 ((r) * np.sin(-alpha_prime))])														  # pt as calculated from standard basis
+	 ((r) * np.sin(-alpha_prime))])														  # point as calculated from standard basis
 	s2_align_pt *= uniform_scale_factor
 	#print ('alignment_pt', pts[0,0])
 	print ('alpha r', alpha, r)
@@ -119,6 +119,6 @@ def find_transf_matrix (pts):															  # Do a check that we are getting 2
 	elif (pts.shape == (2,2,2)):
 		translation_offset = np.zeros((2))
 	else : 
-		print ('Dimentions of input crds not in 2d or 3d')								  # todo: throw exception	
+		print ('Dimentions of input crds not in 2d or 3d')								  # todo: throw exception 
 	return (comp_matrix( find_scale(pts), find_rot(pts), find_shear(pts), find_trans(pts)))
 	
