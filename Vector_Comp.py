@@ -47,14 +47,13 @@ def find_rot (pts):
 
 
 	alpha = np.arctan2(v1[1],v1[0]) - np.arctan2(v0[1],v0[0])							  # alpha angle about x-axis of standard basis (rad)
-	r = np.sqrt(pts[0,0,0]**2 + pts[0,0,1]**2)
-	#r = np.sqrt((pts[1,0,0] - pts[0,0,0])**2 + (pts[1,0,1] - pts[0,0,1])**2)			  # dist from orgin (center of rotation) to alignment point (rough translation will place s1 and s2 allignment points on top of eachother, so we can use s1 alignment point in situ of s2 alignment point)
+	r = np.sqrt(pts[0,0,0]**2 + pts[0,0,1]**2)											  # TODO: This needs to be calculate off of the point to be rotated BEFORE translation, not the alignment pt from S1
 	alpha_prime = np.arctan2(v1[1],v1[0])												  # angle to alpha from x+
 	s2_align_pt = np.array([((r) * np.cos(-alpha_prime)),
 	 ((r) * np.sin(-alpha_prime))])														  # point as calculated from standard basis
 	s2_align_pt *= uniform_scale_factor
-	#print ('alignment_pt', pts[0,0])
-	print ('alpha r', alpha, r)
+	print ('target_alignment_pt', pts[0,0])
+	#print ('alpha r', alpha, r)
 	#print ('alpha_prime', alpha_prime)
 	print ('s2_align_pt', s2_align_pt)
 	#print ('usf',usf)
