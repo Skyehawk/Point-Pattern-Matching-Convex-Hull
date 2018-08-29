@@ -1,5 +1,5 @@
 import numpy as np
-import copy
+import scipy
 from Transformation_Matrix import comp_matrix
 
 # find what it takes to transform v1 to v0, return composed translation matrix
@@ -36,25 +36,17 @@ def find_rot (pts):
 	#temp_translation_offset = np.empty((2), dtype=float)
 	v0 = pts[0,0] -	pts[0,1]															  # v0 = [x,y,z] = [i<hat>, j<hat>, k<hat>]
 	v1 = pts[1,0] - pts[1,1]															  # v1 = [x,y,z] = [i<hat>, j<hat>, k<hat>]
-	print('rot_v', v0, v1)
-
-	dx = pts[1,0,0] - pts[0,0,0]
-	dy = pts[1,0,1] - pts[0,0,1]
 
 	alpha = np.arctan2(v1[1],v1[0]) - np.arctan2(v0[1],v0[0])							  # alpha angle about x-axis of standard basis (rad)
 	r = np.sqrt(pts[1,0,0]**2 + pts[1,0,1]**2)											  # TODO: This needs to be calculate off of the point to be rotated BEFORE translation, not the alignment pt from S1
-	alpha_prime = np.arctan2(v1[1],v1[0])												  # angle to alpha from x+
-	s2_align_pt = np.array([((r) * np.cos(-alpha + alpha_prime)),
-	 ((r) * np.sin(-alpha + alpha_prime))])														 	  # point as calculated from standard basis
-	#s2_align_pt /= uniform_scale_factor
-	#s2_align_pt = s2_align_pt +  np.multiply(uniform_scale_factor-1 * np.array([np.cos(alpha),np.sin(alpha)]), s2_align_pt)		# !!!!!! TODO: apply scale based axis contribution?
+
+	qx = np.cos(-alpha) * pts[1,0,0] - np.sin(-alpha) * pts[1,0,1]
+	qy = np.sin(-alpha) * pts[1,0,0] + np.cos(-alpha) * pts[1,0,1]
+	s2_align_pt = np.array([qx,qy])
+
 	print ('target_alignment_pt', pts[0,0])
 	print ('alpha r', alpha, r)
-	print ('alpha_prime r', alpha_prime, np.sqrt(s2_align_pt[0]**2 + s2_align_pt[1]**2))
 	print ('s2_align_pt', s2_align_pt)
-	#print ('usf',usf)
-	#rotation_offset = s2_align_pt - pts[0,0]														  # failing due to rot_off sometimes being larger than the value of the pt it is being subtracted from
-	#print ('rotation_offset', rotation_offset)
 	#find quadrent & apply based on that for offset
 	#if pts[1,0,0]>0 and pts[1,0,1]>0:													  # q1
 	#	temp_offset *= np.array([1,-1])
@@ -83,8 +75,8 @@ def find_rot (pts):
 	#elif pts[1,0,0]==0 and pts[1,0,1]==0:												  # orgin
 	#	print ('WARNING: point at orgin in rotation offset, should only occur if point was at orgin initially (0,0,0) offset required')
 	#print ('adj_temp_offset',temp_offset)
+	translation_offset += - s2_align_pt + pts[0,0]
 	print ('rotation_translation_offest_contribution', pts[0,0] - s2_align_pt)
-	translation_offset += pts[0,0] - s2_align_pt 													  # check adjustment cases & application of tha adjustment (are we going the wrong way?)
 	print ('combined scale && rotation translation_offset_contribution', translation_offset)
 
 	if (pts.shape == (2,2,3)):
@@ -100,11 +92,12 @@ def find_shear (pts):																	  # to do: build in shear support (warp su
 
 def find_trans (pts):																	  # todo: add in the translation_offset for rotation & scale
 	global translation_offset
+	print('final_translation_offset',translation_offset)
 	if (pts.shape == (2,2,3)):
-		return -(np.append(pts[1,0] - pts[0,0],0)) #+ translation_offset 
-	#return translation_offset # * uniform_scale_factor #np.array([pts[1,0,0] - pts[0,0,0], pts[1,0,1] - pts[0,0,1]])# + translation_offset
-		#return np.array([0,0,0])
-	return np.array([0,0,0])
+		#return -(np.append(pts[1,0] - pts[0,0],0)) #+ translation_offset 
+		return np.array([0,0,0])
+	return translation_offset # * uniform_scale_factor #np.array([pts[1,0,0] - pts[0,0,0], pts[1,0,1] - pts[0,0,1]])# + translation_offset
+	#return np.array([0,0,0])
 
 def find_transf_matrix (pts):															  # Do a check that we are getting 2 or 3 dimentional crds
 	print('pts', pts)
