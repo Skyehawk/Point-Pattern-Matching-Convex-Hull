@@ -27,7 +27,8 @@ def find_scale (pts):																	  # TODO: check for accuracy, close, but o
 		uniform_scale_factor = (dist_0/dist_1)
 		print('uniform_scale_factor', 1/uniform_scale_factor)
 		print('scale_translation_offset_contribution',translation_offset)
-		return uniform_scale_factor*np.ones(2)
+		return np.ones(2)
+		#return uniform_scale_factor*np.ones(2)
 	
 def find_rot (pts):
 	global translation_offset															  # access to the translation accumulator (still need to implement calc of offset)
@@ -35,7 +36,7 @@ def find_rot (pts):
 	#temp_translation_offset = np.empty((2), dtype=float)
 	v0 = pts[0,0] -	pts[0,1]															  # v0 = [x,y,z] = [i<hat>, j<hat>, k<hat>]
 	v1 = pts[1,0] - pts[1,1]															  # v1 = [x,y,z] = [i<hat>, j<hat>, k<hat>]
-	#print('rot_v', v0, v1)
+	print('rot_v', v0, v1)
 
 	dx = pts[1,0,0] - pts[0,0,0]
 	dy = pts[1,0,1] - pts[0,0,1]
@@ -43,14 +44,13 @@ def find_rot (pts):
 	alpha = np.arctan2(v1[1],v1[0]) - np.arctan2(v0[1],v0[0])							  # alpha angle about x-axis of standard basis (rad)
 	r = np.sqrt(pts[1,0,0]**2 + pts[1,0,1]**2)											  # TODO: This needs to be calculate off of the point to be rotated BEFORE translation, not the alignment pt from S1
 	alpha_prime = np.arctan2(v1[1],v1[0])												  # angle to alpha from x+
-	s2_align_pt = np.array([((r) * np.cos(-alpha)),
-	 ((r) * np.sin(-alpha))])														 	  # point as calculated from standard basis
-	s2_align_pt /= uniform_scale_factor
+	s2_align_pt = np.array([((r) * np.cos(-alpha + alpha_prime)),
+	 ((r) * np.sin(-alpha + alpha_prime))])														 	  # point as calculated from standard basis
+	#s2_align_pt /= uniform_scale_factor
 	#s2_align_pt = s2_align_pt +  np.multiply(uniform_scale_factor-1 * np.array([np.cos(alpha),np.sin(alpha)]), s2_align_pt)		# !!!!!! TODO: apply scale based axis contribution?
 	print ('target_alignment_pt', pts[0,0])
 	print ('alpha r', alpha, r)
-	print ('s2_align_pt_r', np.sqrt(s2_align_pt[0]**2 + s2_align_pt[1]**2))
-	#print ('alpha_prime', alpha_prime)
+	print ('alpha_prime r', alpha_prime, np.sqrt(s2_align_pt[0]**2 + s2_align_pt[1]**2))
 	print ('s2_align_pt', s2_align_pt)
 	#print ('usf',usf)
 	#rotation_offset = s2_align_pt - pts[0,0]														  # failing due to rot_off sometimes being larger than the value of the pt it is being subtracted from
@@ -101,11 +101,9 @@ def find_shear (pts):																	  # to do: build in shear support (warp su
 def find_trans (pts):																	  # todo: add in the translation_offset for rotation & scale
 	global translation_offset
 	if (pts.shape == (2,2,3)):
-		#return -(np.append(pts[1,0] - pts[0,0],0)) #+ translation_offset 
-	#return -(pts[1,0] - pts[0,0]) #+ translation_offset 
-		#return - translation_offset
-	#return - translation_offset # * uniform_scale_factor #np.array([pts[1,0,0] - pts[0,0,0], pts[1,0,1] - pts[0,0,1]])# + translation_offset
-		return np.array([0,0,0])
+		return -(np.append(pts[1,0] - pts[0,0],0)) #+ translation_offset 
+	#return translation_offset # * uniform_scale_factor #np.array([pts[1,0,0] - pts[0,0,0], pts[1,0,1] - pts[0,0,1]])# + translation_offset
+		#return np.array([0,0,0])
 	return np.array([0,0,0])
 
 def find_transf_matrix (pts):															  # Do a check that we are getting 2 or 3 dimentional crds
