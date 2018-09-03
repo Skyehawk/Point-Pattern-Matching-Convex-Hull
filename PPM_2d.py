@@ -6,8 +6,6 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from itertools import permutations
 from Vector_Comp import find_transf_matrix
-#from Transformation_Matrix import comp_matrix
-
 
 parser = argparse.ArgumentParser()
 parser.add_argument('filename')

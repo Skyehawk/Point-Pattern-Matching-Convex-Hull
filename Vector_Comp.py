@@ -4,12 +4,11 @@ from Transformation_Matrix import comp_matrix
 
 # find what it takes to transform v1 to v0, return composed translation matrix
 
-translation_offset = np.empty((2), dtype=float)											  # Needs to be upped to 3 for 3d
+translation_offset = np.empty((2), dtype=float)											  # Needs to be upped to 3 for 3d, we can handle this in the find transf_matrix() method
 uniform_scale_factor = 1
-def find_scale (pts):																	  # TODO: check for accuracy, close, but off in testing
+def find_scale (pts):
 	global translation_offset
 	global uniform_scale_factor
-	#global scale_factor
 	dist_0 = 0
 	dist_1 = 0
 	if (pts.shape == (2,2,3)):
@@ -46,23 +45,18 @@ def find_rot (pts):
 	if (pts.shape == (2,2,3)):
 		beta = np.arctan2(v1[2], np.sqrt(np.pow(v1[0],2) + np.pow(v1[1],2))) 			  # beta angle about y-axis of standard basis (rad)
 		- np.arctan2(v0[2], np.sqrt(np.pow(v0[0],2) + np.pow(v0[1],2)))
-		return  np.array([0,-beta,-alpha])												  # todo: fix the locations of these, rotation about the: {x-axis, y-axis, z-axis}
-		#return np.array([0,0,0])
-	return np.array([0,0,-alpha])
-	#return np.array([0,0,0])															  # Testing of proper roation applicatin by the TM algorithm (rad)
+		return  np.array([0,-beta,-alpha])												  # TODO: fix the locations of these, rotation about the: {x-axis, y-axis, z-axis}
+	return np.array([0,0,-alpha])														  # Testing of proper roation applicatin by the TM algorithm (rad)
 
-def find_shear (pts):																	  # to do: build in shear support (warp support) for 3d cases
+def find_shear (pts):																	  # TODO: build in shear support (warp support) for 3d cases
 	return np.ones(3)
 
-def find_trans (pts):																	  # todo: add in the translation_offset for rotation & scale
+def find_trans (pts):																	  # TODO: add in the translation_offset for rotation & scale
 	global translation_offset
 	print('final_translation_offset',translation_offset)
-	if (pts.shape == (2,2,3)):
-		#return -(np.append(pts[1,0] - pts[0,0],0)) #+ translation_offset 
-		return np.array([0,0,0])
-	return translation_offset # * uniform_scale_factor #np.array([pts[1,0,0] - pts[0,0,0], pts[1,0,1] - pts[0,0,1]])# + translation_offset
-	#return np.array([0,0,0])
-	#return np.array([1, 1])
+	if (pts.shape == (2,2,3)): 
+		return translation_offset 														  # Not tested in 3D case
+	return translation_offset
 
 def find_transf_matrix (pts):															  # Do a check that we are getting 2 or 3 dimentional crds
 	print('pts', pts)

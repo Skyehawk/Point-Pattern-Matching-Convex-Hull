@@ -40,6 +40,8 @@ def comp_matrix(scale, rotation, shear, translation):
                      [0, 0, 1, 0],
                      [0, 0, 0, 1]])
 
+	# TODO: Add support for off primary axis rotation (rotation about an arbitary axis)
+
 	return np.dot(T_M,np.dot(Rz_M,np.dot(Rx_M,np.dot(Ry_M,S_M))))						  # IMPORTANT: the transformations must be multiplied together in the [B]reverse order[/B] to that in which we want them applied
 
 def decomp_matrix(transformation_matrix):
@@ -51,6 +53,6 @@ def decomp_matrix(transformation_matrix):
 	rotation = np.array([np.arctan2(tm[2,1]/scale[1],tm[2,2],scale[2]),
 						 np.arctan2(-tm[2,0]/scale[0],np.sqrt(np.pow(tm[2,1]/scale[1],2)+np.pow(tm[2,2]/scale[2],2))),
 						 np.arctan2(tm[1,0]/scale[0],tm[0,0]/scale[0])])
-	shear = np.zeros(4)										# need support for shear
+	shear = np.zeros(3)										# need support for shear
 
-	return 	np.array(translation, scale, rotation, shear)								  # TODO: put these in the order we are using elsewhere
+	return 	np.array(scale, rotation, shear, translation)
