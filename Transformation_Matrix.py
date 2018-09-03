@@ -3,7 +3,7 @@ import numpy as np
 def comp_matrix(scale, rotation, shear, translation):
 	# should filter inputs if accepting error prone input (dtype, length, and domains)
 	Tx = translation[0]
-	Ty = translation[1]										# eff: we only ever use these variables once, no need to call them, parse input as needed
+	Ty = translation[1]																	  # eff: we only ever use these variables once, no need to call them, parse input as needed
 	Tz = 0 if translation.size < 3 else translation[2]
 	Sx = scale[0]
 	Sy = scale[1]
@@ -12,7 +12,7 @@ def comp_matrix(scale, rotation, shear, translation):
 	Shy = shear[1]
 	Shz = 0 if shear.size < 3 else shear[2]
 	Rxc, Rxs = np.cos(rotation[0]), np.sin(rotation[0])
-	Ryc, Rys = np.cos(rotation[1]), np.sin(rotation[1])		# eff: we call these variables multiple times, create standalones for efficency   if Shx else 0
+	Ryc, Rys = np.cos(rotation[1]), np.sin(rotation[1])									  # eff: we call these variables multiple times, create standalones for efficency
 	Rzc, Rzs = (1,0) if rotation.size < 3 else (np.cos(rotation[2]), np.sin(rotation[2]))
 
 	T_M = np.array([[1, 0, 0, Tx],
@@ -40,7 +40,9 @@ def comp_matrix(scale, rotation, shear, translation):
                      [0, 0, 1, 0],
                      [0, 0, 0, 1]])
 
-	return np.dot(S_M,np.dot(T_M,np.dot(Rz_M,np.dot(Ry_M,Rx_M))))						  # IMPORTANT: the transformations must be multiplied together in the [B]reverse order[/B] to that in which we want them applied
+	# TODO: Add support for off primary axis rotation (rotation about an arbitary axis)
+
+	return np.dot(T_M,np.dot(Rz_M,np.dot(Rx_M,np.dot(Ry_M,S_M))))						  # IMPORTANT: the transformations must be multiplied together in the [B]reverse order[/B] to that in which we want them applied
 
 def decomp_matrix(transformation_matrix):
 	tm = transformation_matrix
@@ -51,6 +53,6 @@ def decomp_matrix(transformation_matrix):
 	rotation = np.array([np.arctan2(tm[2,1]/scale[1],tm[2,2],scale[2]),
 						 np.arctan2(-tm[2,0]/scale[0],np.sqrt(np.pow(tm[2,1]/scale[1],2)+np.pow(tm[2,2]/scale[2],2))),
 						 np.arctan2(tm[1,0]/scale[0],tm[0,0]/scale[0])])
-	shear = np.zeros(4)										# need support for shear
+	shear = np.zeros(3)										# need support for shear
 
-	return 	np.array(translation, scale, rotation, shear)
+	return 	np.array(scale, rotation, shear, translation)
