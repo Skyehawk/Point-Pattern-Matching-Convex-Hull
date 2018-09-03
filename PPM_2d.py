@@ -38,7 +38,7 @@ for c in (hull_2.simplices):															  # Set of indicies of points forming
 	for s in (hull_1.simplices):														  # Set of indicies of points forming first hull
 		for p in permutations(c,2):														  # Normal and flipped indicies for second hull points
 			pts_2_t = pts_2 															  # reset our points to manipulate between checks
-			raw_input("Press Enter to continue...")  # input("Press Enter to continue...")
+			#raw_input("Press Enter to continue...")
 			pts_considered = np.array([[hull_1.points[s[0]], hull_1.points[s[1]]], [hull_2.points[p[0]], hull_2.points[p[1]]]])
 			print ('Pts_considered', pts_considered)
 			transf_matrix = find_transf_matrix(np.array([[hull_1.points[s[0]], hull_1.points[s[1]]], [hull_2.points[p[0]], hull_2.points[p[1]]]]))

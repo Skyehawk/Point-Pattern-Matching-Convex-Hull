@@ -98,6 +98,7 @@ def find_trans (pts):																	  # todo: add in the translation_offset fo
 		return np.array([0,0,0])
 	return translation_offset # * uniform_scale_factor #np.array([pts[1,0,0] - pts[0,0,0], pts[1,0,1] - pts[0,0,1]])# + translation_offset
 	#return np.array([0,0,0])
+	#return np.array([1, 1])
 
 def find_transf_matrix (pts):															  # Do a check that we are getting 2 or 3 dimentional crds
 	print('pts', pts)
@@ -108,5 +109,5 @@ def find_transf_matrix (pts):															  # Do a check that we are getting 2
 		translation_offset = np.zeros((2))
 	else : 
 		print ('Dimentions of input crds not in 2d or 3d')								  # todo: throw exception 
-	return (comp_matrix( find_scale(pts), find_rot(pts), find_shear(pts), find_trans(pts)))
+	return (comp_matrix(find_scale(pts), find_rot(pts), find_shear(pts), find_trans(pts)))
 	

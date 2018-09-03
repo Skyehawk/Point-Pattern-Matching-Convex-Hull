@@ -40,7 +40,7 @@ def comp_matrix(scale, rotation, shear, translation):
                      [0, 0, 1, 0],
                      [0, 0, 0, 1]])
 
-	return np.dot(Rz_M,np.dot(Ry_M,np.dot(Rx_M,np.dot(S_M,T_M))))
+	return np.dot(S_M,np.dot(T_M,np.dot(Rz_M,np.dot(Ry_M,Rx_M))))						  # IMPORTANT: the transformations must be multiplied together in the [B]reverse order[/B] to that in which we want them applied
 
 def decomp_matrix(transformation_matrix):
 	tm = transformation_matrix
