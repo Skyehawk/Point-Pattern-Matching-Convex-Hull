@@ -2,8 +2,6 @@ import numpy as np
 import scipy
 from Transformation_Matrix import comp_matrix
 
-# find what it takes to transform v1 to v0, return composed translation matrix
-
 translation_offset = np.empty((2), dtype=float)											  # Needs to be upped to 3 for 3d, we can handle this in the find transf_matrix() method
 uniform_scale_factor = 1
 def find_scale (pts):
@@ -35,11 +33,6 @@ def find_rot (pts):
 	qx = np.cos(-alpha) * pts[1,0,0] - np.sin(-alpha) * pts[1,0,1]
 	qy = np.sin(-alpha) * pts[1,0,0] + np.cos(-alpha) * pts[1,0,1]
 	s2_align_pt = np.array([qx,qy])
-
-	print ('target_alignment_pt', pts[0,0])
-	print ('uniform_scale_factor', uniform_scale_factor)
-	#print ('alpha r', alpha, r)
-	#print ('s2_align_pt', s2_align_pt)
 	translation_offset += (- (s2_align_pt * uniform_scale_factor) + pts[0,0])
 
 	if (pts.shape == (2,2,3)):
@@ -53,13 +46,11 @@ def find_shear (pts):																	  # TODO: build in shear support (warp sup
 
 def find_trans (pts):																	  # TODO: add in the translation_offset for rotation & scale
 	global translation_offset
-	print('final_translation_offset',translation_offset)
 	if (pts.shape == (2,2,3)): 
 		return translation_offset 														  # Not tested in 3D case
 	return translation_offset
 
 def find_transf_matrix (pts):															  # Do a check that we are getting 2 or 3 dimentional crds
-	print('pts', pts)
 	global translation_offset															  # Create a touple with correct dimentions bsed on input pts
 	if (pts.shape == (2,2,3)):
 		translation_offset = np.append(np.zeros((2)),0)	
