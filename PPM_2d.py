@@ -57,10 +57,6 @@ for c in (hull_2.simplices):															  # Set of indicies of points forming
 			for idx_touple in rows_to_fuse:
 				if idx_touple[1] + 1 > np.size(pts_1,axis=0) and idx_touple[0] + 1 <= np.size(pts_1,axis=0):	  # TODO: check to make sure pts are not both in pts2_t as well
 					err_sq += (aligned_pts[idx_touple[0]][0]-aligned_pts[idx_touple[1]][0])**2 + (aligned_pts[idx_touple[0]][1]-aligned_pts[idx_touple[1]][1])**2
-			
-			#print ('transf_matrix',transf_matrix)                    
-			# X log permutation combination (indicies or otherwise)
-			# calculate non-uniform scaling
 
 			nuScale = np.ones(3)														  # Scale values along X, Y, & Z axes
 			# perform non uniform scaling (uScale)
@@ -71,34 +67,34 @@ for c in (hull_2.simplices):															  # Set of indicies of points forming
 			# log error for permutation
 			df_log.loc[-1] = [len(rows_to_fuse), err_sq, transf_matrix]
 			df_log.index = df_log.index + 1
-			#print(p)
-
-			#RD1Fig = plt.figure()
-			#ax = RD1Fig.add_subplot(111)
-			#ax.plot(pts_1.T[0], pts_1.T[1], "ko")
-			#ax.plot(pts_2.T[0], pts_2.T[1], "bo")
-			#ax.plot(pts_2_t[0], pts_2_t[1], "gx") 										  # pts is already transposed due to the transformation matrix
-			##ax.plot(q.T[0], q.T[1], "go")
-
-			#for s in hull_1.simplices:
-			#	ax.plot(pts_1[s, 0], pts_1[s, 1], "r-")
-
-			#for s in hull_2.simplices:
-			#	ax.plot(pts_2[s, 0], pts_2[s, 1], "r-")
-
-			#for pts_con in pts_considered:
-			#	ax.plot(pts_con.T[0], pts_con.T[1], "y-")
-
-			#ax.plot(side_consideration_t[:2,:][0], side_consideration_t[:2,:][1], "k-")
-
-			#ax.set_xlabel('X_1')
-			#ax.set_ylabel('Y_1')
-
-			#plt.show()
+			
 elapsed = timeit.default_timer() - start_time
 print('------------------------------------')
 print('Execution Time: ', elapsed, 'sec.')
-df_log = df_log.sort_values(['Matches', 'Total Error Squared'], ascending=[False, True])  # sorting by nnumber of matches then by err^2
+df_log.sort_values(['Matches', 'Total Error Squared'], ascending=[False, True], inplace=True)  # sorting by nnumber of matches then by err^2
+df_log.reset_index(inplace=True, drop=True)
 #df_log = df_log.sort_index()  															  # sorting by index
 print(df_log.head(12))
+
+pts_2_t = df_log.at[0,'T_Matrix'].dot(np.c_[pts_2,np.zeros(np.size(pts_2,0)),np.ones(np.size(pts_2,0))].T)
+
+RD1Fig = plt.figure()
+ax = RD1Fig.add_subplot(111)
+ax.plot(pts_1.T[0], pts_1.T[1], "ko")
+#ax.plot(pts_2.T[0], pts_2.T[1], "gx")
+ax.plot(pts_2_t[0], pts_2_t[1], "cP") 										  # pts is already transposed due to the transformation matrix
+#ax.plot(q.T[0], q.T[1], "go")
+
+for s in hull_1.simplices:
+	ax.plot(pts_1[s, 0], pts_1[s, 1], "r-")
+#for s in hull_2.simplices:
+#	ax.plot(pts_2[s, 0], pts_2[s, 1], "r-")
+#for pts_con in pts_considered:
+#	ax.plot(pts_con.T[0], pts_con.T[1], "y-")
+#ax.plot(side_consideration_t[:2,:][0], side_consideration_t[:2,:][1], "k-")
+
+ax.set_xlabel('X_1')
+ax.set_ylabel('Y_1')
+
+plt.show()
 #End
