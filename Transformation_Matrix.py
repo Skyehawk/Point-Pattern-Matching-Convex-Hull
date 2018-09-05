@@ -1,5 +1,19 @@
-import numpy as np
+import numpy as np 																		  # ver. 1.15.0
 
+#** 
+# @author      Skye Leake <skleake96@gmail.com>
+# @version     0.1.0
+# @since       0.0.0
+#/
+
+#**
+# Composes transformation matrix from input scale, rotation, shear and translation parameters
+# @param  scale 				- [float] (inf, inf) zero colapses all to a point, negative values reflect
+# @param  rotaion 				- [float] [-pi/2, pi/2] rotation about (0,0,0) as measured from x+ (right handed) 
+# @param  shear 				- [float] shear along a primary axis (not implemented)
+# @param  translation 			- [float] translation along a primary axis
+# @return Transformation matrix - [float] calcualted: scale by rotation_y by rotation_x by rotation_z by translation
+#/
 def comp_matrix(scale, rotation, shear, translation):
 	# should filter inputs if accepting error prone input (dtype, length, and domains)
 	Tx = translation[0]
@@ -44,6 +58,11 @@ def comp_matrix(scale, rotation, shear, translation):
 
 	return np.dot(T_M,np.dot(Rz_M,np.dot(Rx_M,np.dot(Ry_M,S_M))))						  # IMPORTANT: the transformations must be multiplied together in the [B]reverse order[/B] to that in which we want them applied
 
+#**
+# Decompose transformation matrix into its component parts (Not used and probally full of bugs)
+# @param  transformation_matrix - [floats] 4x4 transformation matrix 
+# @return component_array - [[floats],[floats],[floats],[floats]] scale, rotation, shear, translation
+#/
 def decomp_matrix(transformation_matrix):
 	tm = transformation_matrix
 	translation = np.array([tm[0,3], tm[1,3], tm[2,3]])
@@ -53,6 +72,6 @@ def decomp_matrix(transformation_matrix):
 	rotation = np.array([np.arctan2(tm[2,1]/scale[1],tm[2,2],scale[2]),
 						 np.arctan2(-tm[2,0]/scale[0],np.sqrt(np.pow(tm[2,1]/scale[1],2)+np.pow(tm[2,2]/scale[2],2))),
 						 np.arctan2(tm[1,0]/scale[0],tm[0,0]/scale[0])])
-	shear = np.zeros(3)										# need support for shear
+	shear = np.zeros(3)																	  # TODO: support for shear
 
 	return 	np.array(scale, rotation, shear, translation)
