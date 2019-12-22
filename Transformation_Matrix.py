@@ -66,12 +66,13 @@ def comp_matrix(scale, rotation, shear, translation):
 def decomp_matrix(transformation_matrix):
 	tm = transformation_matrix
 	translation = np.array([tm[0,3], tm[1,3], tm[2,3]])
-	scale = np.array([np.abs(np.sqrt(np.pow(tm[0,0],2)+np.pow(tm[1,0],2)+np.pow(tm[2,0],2))),
-					  np.abs(np.sqrt(np.pow(tm[0,1],2)+np.pow(tm[1,1],2)+np.pow(tm[2,1],2))),
-					  np.abs(np.sqrt(np.pow(tm[0,2],2)+np.pow(tm[1,2],2)+np.pow(tm[2,2],2)))])
-	rotation = np.array([np.arctan2(tm[2,1]/scale[1],tm[2,2],scale[2]),
-						 np.arctan2(-tm[2,0]/scale[0],np.sqrt(np.pow(tm[2,1]/scale[1],2)+np.pow(tm[2,2]/scale[2],2))),
-						 np.arctan2(tm[1,0]/scale[0],tm[0,0]/scale[0])])
+	scale = np.array([np.abs(np.sqrt(np.power(tm[0,0],2)+np.power(tm[1,0],2)+np.power(tm[2,0],2))),
+					  np.abs(np.sqrt(np.power(tm[0,1],2)+np.power(tm[1,1],2)+np.power(tm[2,1],2))),
+					  np.abs(np.sqrt(np.power(tm[0,2],2)+np.power(tm[1,2],2)+np.power(tm[2,2],2)))])
+	#rotation = np.array([np.arctan2(tm[2,1]/scale[1],tm[2,2],scale[2]),
+	#					 np.arctan2(-tm[2,0]/scale[0],np.sqrt(np.power(tm[2,1]/scale[1],2)+np.power(tm[2,2]/scale[2],2))),
+	#					 np.arctan2(tm[1,0]/scale[0],tm[0,0]/scale[0])])
+	rotation = np.ones(3)
 	shear = np.zeros(3)																	  # TODO: support for shear
 
-	return 	np.array(scale, rotation, shear, translation)
+	return 	np.array([scale, rotation, shear, translation])

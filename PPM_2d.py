@@ -1,3 +1,9 @@
+#** 
+# @author      Skye Leake <skleake96@gmail.com>
+# @version     0.1.2
+# @since       0.0.0
+#/
+
 import argparse
 import timeit
 import numpy as np 																		  # ver. 1.15.0
@@ -8,32 +14,53 @@ from mpl_toolkits.mplot3d import Axes3D
 from itertools import permutations
 from Vector_Comp import find_transf_matrix												  # ver. 0.1.0 
 
-#** 
-# @author      Skye Leake <skleake96@gmail.com>
-# @version     0.1.1
-# @since       0.0.0
-#/
+from Transformation_Matrix import comp_matrix, decomp_matrix							  # ver. 0.1.0 only used in this file for the generation of test data
+from sklearn.datasets import make_blobs
 
 parser = argparse.ArgumentParser()														  # Take a path to the .cv file containing the points as input
-parser.add_argument('filename')
-args = parser.parse_args()
-with open(args.filename) as file:
-	rDDF = pd.read_csv(file, skiprows=3)												  # Rows in .csv header
-	print(rDDF.head(8))
+#parser.add_argument("-i", "--input", help=" path to the input file (GRIB)")
+parser.add_argument("-f", "--filename", help=" path to the input file (.csv)")
+args = vars(parser.parse_args())
 
-pts_1_df = rDDF[['X_1','Y_1']].as_matrix()
-pts_1 = pts_1_df[np.logical_and(~np.isnan(pts_1_df)[:,0], ~np.isnan(pts_1_df)[:,1])]	  # Convert to np.matrix & filter to remove nulls
+pts_1 = np.zeros(np.shape([1,1]))
+pts_2 = np.zeros(np.shape([1,1]))
+
+if args["filename"]:
+	with open(str(args["filename"])) as file:
+		rDDF = pd.read_csv(file, skiprows=3)												  # Rows in .csv header
+		print(rDDF.head(8))
+
+
+	pts_1_df = rDDF[['X_1','Y_1']].as_matrix()
+	pts_1 = pts_1_df[np.logical_and(~np.isnan(pts_1_df)[:,0], ~np.isnan(pts_1_df)[:,1])]	  # Convert to np.matrix & filter to remove nulls
+	hull_1 = ConvexHull(pts_1)
+
+	pts_2_df = rDDF[['X_2','Y_2']].as_matrix()
+	pts_2 = pts_2_df[np.logical_and(~np.isnan(pts_2_df)[:,0], ~np.isnan(pts_2_df)[:,1])]	  # Convert to np.matrix & filter to remove nulls
+	hull_2 = ConvexHull(pts_2)
+
+	pts_2_t = pts_2
+
+	print('pts_1', pts_1)
+	print('pts_2', pts_2)
+
+else:
+	pts_1, y = make_blobs(n_samples=100, centers=1, n_features=2, cluster_std=1.0, random_state=None)
+	print(pts_1)																		  # Generate some test data if input file is not supplied
+	rndTransParams = np.random.rand(3,3)												  # Create a random transformation
+	print("Random trans Params: \n" + 
+		"\n  Scale: " + str(rndTransParams[0,0]*2) + "\n  Rotation: " + str(np.array([0,0,rndTransParams[1,0]*2*np.pi])) +
+		"\n  Shear: " + str(np.ones(3)) + "\n  Translation: " + str(rndTransParams[2,:2]))
+	
+	tdata_transf_matrix = comp_matrix(np.array([rndTransParams[0,0]*2, rndTransParams[0,0]*2]), np.array([0,0,rndTransParams[1,0]*2*np.pi]), np.ones(3), rndTransParams[2,:2])
+	#tdata_transf_matrix = comp_matrix(np.ones(2), np.ro(2), np.zeros(2), np.array([1.,1.]))
+	pts_2 = tdata_transf_matrix.dot(np.c_[pts_1,np.zeros(np.size(pts_1,0)),np.ones(np.size(pts_1,0))].T)
+	pts_2 = pts_2.T[:,:2]
+	#print (pts_1)
+	#print (pts_2)
+
 hull_1 = ConvexHull(pts_1)
-
-pts_2_df = rDDF[['X_2','Y_2']].as_matrix()
-pts_2 = pts_2_df[np.logical_and(~np.isnan(pts_2_df)[:,0], ~np.isnan(pts_2_df)[:,1])]	  # Convert to np.matrix & filter to remove nulls
 hull_2 = ConvexHull(pts_2)
-
-pts_2_t = pts_2
-
-print('pts_1', pts_1)
-print('pts_2', pts_2)
-
 #print('Hull_1_pts',hull_1.points)
 #print('Hull_1_pts',hull_2.points)
 
@@ -46,14 +73,14 @@ for c in (hull_2.simplices):															  # Set of indicies of points forming
 			#raw_input("Press Enter to continue...")
 			pts_considered = np.array([[hull_1.points[s[0]], hull_1.points[s[1]]], [hull_2.points[p[0]], hull_2.points[p[1]]]])
 			transf_matrix = find_transf_matrix(np.array([[hull_1.points[s[0]], hull_1.points[s[1]]], [hull_2.points[p[0]], hull_2.points[p[1]]]]))
-			pts_2_t = transf_matrix.dot(np.c_[pts_2,np.zeros(np.size(pts_2,0)),np.ones(np.size(pts_2,0))].T) #https://mail.python.org/pipermail/python-list/2013-October/657294.html  --> apply the transformation matrix
+			pts_2_t = transf_matrix.dot(np.c_[pts_2[:,:2],np.zeros(np.size(pts_2,0)),np.ones(np.size(pts_2,0))].T) #https://mail.python.org/pipermail/python-list/2013-October/657294.html  --> apply the transformation matrix
 			side_consideration = np.array([hull_2.points[p[0]], hull_2.points[p[1]]])
 			side_consideration_t = transf_matrix.dot(np.c_[side_consideration,np.zeros(np.size(side_consideration,0)),np.ones(np.size(side_consideration,0))].T)
 			#print('pts_2_t', pts_2_t.T[:,:2])
 
 			aligned_pts = np.vstack((pts_1, pts_2_t.T[:,:2]))
 			pts_tree = cKDTree(aligned_pts)												  # create a KD tree to quickly find pairs f points falling w/in a threshold distance
-			rows_to_fuse = pts_tree.query_pairs(r=0.1)									  # TODO: We need to create a dynamic threshold
+			rows_to_fuse = pts_tree.query_pairs(r=0.000001)								  # TODO: We need to create a dynamic threshold
 			#print(repr (list(rows_to_fuse)))
 			#print(repr(aligned_pts[list(rows_to_fuse)]))
 
@@ -71,16 +98,18 @@ print('------------------------------------')
 print('Execution Time: ', elapsed, 'sec.')
 df_log.sort_values(['Matches', 'Total Error Squared'], ascending=[False, True], inplace=True)  # sorting by number of matches then by err^2
 df_log.reset_index(inplace=True, drop=True)
-print(df_log.head(12))
+print("\nBest Match Transformation Matrix To Convert Set \"B\" To Set \"A\":\n" + str(df_log.at[0,'T_Matrix']))
+
+#print("Calculated Transformations: " + 
+#	"\nScale: " + str(np.power(decomp_matrix(df_log.iloc[0,2])[0,0],-1.0)) + 
+#	"\nRotation: " + "" + "\nShear: " + "" +
+#	"\nTranslation: " + str(np.power(decomp_matrix(df_log.iloc[0,2])[3,:2],1.0)))
+print("\n", df_log.head(12))
 
 pts_2_t = df_log.at[0,'T_Matrix'].dot(np.c_[pts_2,np.zeros(np.size(pts_2,0)),np.ones(np.size(pts_2,0))].T) 	  # apply closest match's transformation parameters
 
 RD1Fig = plt.figure()
 ax = RD1Fig.add_subplot(111)
-ax.plot(pts_1.T[0], pts_1.T[1], "ko")
-#ax.plot(pts_2.T[0], pts_2.T[1], "gx")
-ax.plot(pts_2_t[0], pts_2_t[1], "cP") 													  # pts is already transposed due to the transformation matrix
-#ax.plot(q.T[0], q.T[1], "go")
 
 for s in hull_1.simplices:
 	ax.plot(pts_1[s, 0], pts_1[s, 1], "r-")
@@ -89,6 +118,11 @@ for s in hull_1.simplices:
 #for pts_con in pts_considered:
 #	ax.plot(pts_con.T[0], pts_con.T[1], "y-")
 #ax.plot(side_consideration_t[:2,:][0], side_consideration_t[:2,:][1], "k-")
+
+ax.plot(pts_1.T[0], pts_1.T[1], "ko")
+#ax.plot(pts_2.T[0], pts_2.T[1], "gx")
+ax.plot(pts_2_t[0], pts_2_t[1], "cP") 													  # pts is already transposed due to the transformation matrix
+#ax.plot(q.T[0], q.T[1], "go")
 
 ax.set_xlabel('X_1')
 ax.set_ylabel('Y_1')
