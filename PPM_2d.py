@@ -55,7 +55,7 @@ else:
 	tdata_transf_matrix = comp_matrix(np.array([rndTransParams[0,0]*2, rndTransParams[0,0]*2]), np.array([0,0,rndTransParams[1,0]*2*np.pi]), np.ones(3), rndTransParams[2,:2])
 	#tdata_transf_matrix = comp_matrix(np.ones(2), np.ro(2), np.zeros(2), np.array([1.,1.]))
 	pts_2 = tdata_transf_matrix.dot(np.c_[pts_1,np.zeros(np.size(pts_1,0)),np.ones(np.size(pts_1,0))].T)
-	pts_2 = pts_2.T[:,:2]
+	pts_2 = pts_2.T[:80,:2]															  # hold part of the dataset back to simulate differance
 	#print (pts_1)
 	#print (pts_2)
 
@@ -64,6 +64,7 @@ hull_2 = ConvexHull(pts_2)
 #print('Hull_1_pts',hull_1.points)
 #print('Hull_1_pts',hull_2.points)
 
+i = 0
 df_log = pd.DataFrame(columns=['Matches', 'Total Error Squared','T_Matrix',]) 			  # create dataframe as log of each itteration of inermost loop parameters
 start_time = timeit.default_timer()														  # Start timer
 for c in (hull_2.simplices):															  # Set of indicies of points forming second hull
@@ -92,10 +93,12 @@ for c in (hull_2.simplices):															  # Set of indicies of points forming
 
 			df_log.loc[-1] = [len(rows_to_fuse), err_sq, transf_matrix]					  # log our parameters and index our log +1
 			df_log.index = df_log.index + 1
+			i +=1
 			
 elapsed = timeit.default_timer() - start_time											  # Stop timer & get duration
 print('------------------------------------')
 print('Execution Time: ', elapsed, 'sec.')
+print ("Iter: ", i)
 df_log.sort_values(['Matches', 'Total Error Squared'], ascending=[False, True], inplace=True)  # sorting by number of matches then by err^2
 df_log.reset_index(inplace=True, drop=True)
 print("\nBest Match Transformation Matrix To Convert Set \"B\" To Set \"A\":\n" + str(df_log.at[0,'T_Matrix']))
