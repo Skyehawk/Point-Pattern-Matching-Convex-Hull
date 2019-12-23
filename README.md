@@ -8,5 +8,5 @@ Implementation of the following: https://ieeexplore.ieee.org/abstract/document/6
 
 Todo: - Shear support
       - Non-uniform scaling support
-      - Cython optimizations/ parellel processing optimizations
+      - Cython optimizations/ parallel processing optimizations
       - Take another stab at the 3D beastie
