@@ -1,8 +1,4 @@
-#** 
-# @author      Skye Leake <skleake96@gmail.com>
-# @version     0.1.2
-# @since       0.0.0
-#/
+
 
 import argparse
 import timeit
@@ -56,13 +52,9 @@ else:
 	#tdata_transf_matrix = comp_matrix(np.ones(2), np.ro(2), np.zeros(2), np.array([1.,1.]))
 	pts_2 = tdata_transf_matrix.dot(np.c_[pts_1,np.zeros(np.size(pts_1,0)),np.ones(np.size(pts_1,0))].T)
 	pts_2 = pts_2.T[:80,:2]															  # hold part of the dataset back to simulate differance
-	#print (pts_1)
-	#print (pts_2)
 
 hull_1 = ConvexHull(pts_1)
 hull_2 = ConvexHull(pts_2)
-#print('Hull_1_pts',hull_1.points)
-#print('Hull_1_pts',hull_2.points)
 
 i = 0
 df_log = pd.DataFrame(columns=['Matches', 'Total Error Squared','T_Matrix',]) 			  # create dataframe as log of each itteration of inermost loop parameters
