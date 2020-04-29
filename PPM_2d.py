@@ -1,5 +1,3 @@
-
-
 import argparse
 import timeit
 import numpy as np 																		  # ver. 1.15.0
@@ -37,12 +35,12 @@ if args["filename"]:
 
 	pts_2_t = pts_2
 
-	print('pts_1', pts_1)
-	print('pts_2', pts_2)
+	#print('pts_1', pts_1)
+	#print('pts_2', pts_2)
 
 else:
-	pts_1, y = make_blobs(n_samples=100, centers=1, n_features=2, cluster_std=1.0, random_state=None)
-	print(pts_1)																		  # Generate some test data if input file is not supplied
+	pts_1, y = make_blobs(n_samples=1000000, centers=1, n_features=2, cluster_std=1.0, random_state=None)
+	#print(pts_1)																		  # Generate some test data if input file is not supplied
 	rndTransParams = np.random.rand(3,3)												  # Create a random transformation
 	print("Random trans Params: \n" + 
 		"\n  Scale: " + str(rndTransParams[0,0]*2) + "\n  Rotation: " + str(np.array([0,0,rndTransParams[1,0]*2*np.pi])) +
@@ -51,16 +49,16 @@ else:
 	tdata_transf_matrix = comp_matrix(np.array([rndTransParams[0,0]*2, rndTransParams[0,0]*2]), np.array([0,0,rndTransParams[1,0]*2*np.pi]), np.ones(3), rndTransParams[2,:2])
 	#tdata_transf_matrix = comp_matrix(np.ones(2), np.ro(2), np.zeros(2), np.array([1.,1.]))
 	pts_2 = tdata_transf_matrix.dot(np.c_[pts_1,np.zeros(np.size(pts_1,0)),np.ones(np.size(pts_1,0))].T)
-	pts_2 = pts_2.T[:80,:2]															  # hold part of the dataset back to simulate differance
+	pts_2 = pts_2.T[:800000,:2]															  # hold part of the dataset back to simulate differance
 
 hull_1 = ConvexHull(pts_1)
 hull_2 = ConvexHull(pts_2)
 
-i = 0
 df_log = pd.DataFrame(columns=['Matches', 'Total Error Squared','T_Matrix',]) 			  # create dataframe as log of each itteration of inermost loop parameters
 start_time = timeit.default_timer()														  # Start timer
-for c in (hull_2.simplices):															  # Set of indicies of points forming second hull
-	for s in (hull_1.simplices):														  # Set of indicies of points forming first hull
+
+for c in hull_2.simplices:															 	 # Set of indicies of points forming second hull
+	for s in hull_1.simplices:															  # Set of indicies of points forming first hull
 		for p in permutations(c,2):														  # Normal and flipped indicies for second hull points
 			pts_2_t = pts_2 															  # reset our points to manipulate between checks
 			#raw_input("Press Enter to continue...")
@@ -85,12 +83,10 @@ for c in (hull_2.simplices):															  # Set of indicies of points forming
 
 			df_log.loc[-1] = [len(rows_to_fuse), err_sq, transf_matrix]					  # log our parameters and index our log +1
 			df_log.index = df_log.index + 1
-			i +=1
 			
 elapsed = timeit.default_timer() - start_time											  # Stop timer & get duration
 print('------------------------------------')
 print('Execution Time: ', elapsed, 'sec.')
-print ("Iter: ", i)
 df_log.sort_values(['Matches', 'Total Error Squared'], ascending=[False, True], inplace=True)  # sorting by number of matches then by err^2
 df_log.reset_index(inplace=True, drop=True)
 print("\nBest Match Transformation Matrix To Convert Set \"B\" To Set \"A\":\n" + str(df_log.at[0,'T_Matrix']))
