@@ -74,7 +74,7 @@ def main():
 
 	else:
 		print('Generating Test Data...')
-		pts_1, y = make_blobs(n_samples=1000, centers=1, n_features=2, cluster_std=1.0, random_state=None)
+		pts_1, y = make_blobs(n_samples=250000, centers=1, n_features=2, cluster_std=1.0, random_state=None)
 		#print(pts_1)																		  # Generate some test data if input file is not supplied
 		rndTransParams = np.random.rand(3,3)												  # Create a random transformation
 		print("Random trans Params: \n" + 
@@ -83,7 +83,7 @@ def main():
 		
 		tdata_transf_matrix = comp_matrix(np.array([rndTransParams[0,0]*2, rndTransParams[0,0]*2]), np.array([0,0,rndTransParams[1,0]*2*np.pi]), np.ones(3), rndTransParams[2,:2])
 		pts_2 = tdata_transf_matrix.dot(np.c_[pts_1,np.zeros(np.size(pts_1,0)),np.ones(np.size(pts_1,0))].T)
-		pts_2 = pts_2.T[:250,:2]															  # hold part of the dataset back to simulate differance
+		pts_2 = pts_2.T[:50000,:2]															  # hold part of the dataset back to simulate differance
 
 	hull_1 = ConvexHull(pts_1)
 	hull_2 = ConvexHull(pts_2)
