@@ -59,11 +59,11 @@ def main():
 			print(rDDF.head(8))
 
 
-		pts_1_df = rDDF[['X_1','Y_1']].as_matrix()
+		pts_1_df = rDDF[['X_1','Y_1']].to_numpy()
 		pts_1 = pts_1_df[np.logical_and(~np.isnan(pts_1_df)[:,0], ~np.isnan(pts_1_df)[:,1])]	  # Convert to np.matrix & filter to remove nulls
 		hull_1 = ConvexHull(pts_1)
 
-		pts_2_df = rDDF[['X_2','Y_2']].as_matrix()
+		pts_2_df = rDDF[['X_2','Y_2']].to_numpy()
 		pts_2 = pts_2_df[np.logical_and(~np.isnan(pts_2_df)[:,0], ~np.isnan(pts_2_df)[:,1])]	  # Convert to np.matrix & filter to remove nulls
 		hull_2 = ConvexHull(pts_2)
 
